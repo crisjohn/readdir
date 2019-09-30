@@ -76,6 +76,24 @@ const readTargetPath = (targetPath, obj) => {
 }
 
 /**
+ * execute
+ * @param {Object} obj 
+ * @param {Array} params 5 arguments only, increase if needed.
+ */
+const execute = (obj, params) => {
+
+    const mapping = (param) => {
+        return _.mapValues(param, (v) => {
+            if (v && typeof v === "function") return v(params[0], params[1], params[2], params[3], params[4])
+            else if(v && typeof v === "object") return mapping(v, params)
+            else return v
+        });
+    }
+
+    return mapping(obj);
+}
+
+/**
  * initialize
  * @param {array||string} paths target path to lookup
  */
@@ -96,7 +114,13 @@ const init = (paths) => {
          * @example "folder.folder" or "folder.folder.file"
          * @param {string} val value to lookup
          */
-        "get": (val) => _.get(temp, val)
+        "get": (val) => _.get(temp, val),
+        /**
+         * exec
+         * @val [String] 
+         * @params [any]
+         */
+        "exec": (val, ...params) => execute(_.get(temp, val), params)
     };
 
 };
