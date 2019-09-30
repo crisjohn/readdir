@@ -1,5 +1,9 @@
 # readdir
 
+```bash
+npm install
+```
+
 ## Initialize
 
 ```javascript
