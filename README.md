@@ -7,7 +7,7 @@ npm install
 ## Initialize
 
 ```javascript
-const readdir = require("./index");
+const readdir = require("./node_modules/readdir");
 const resources = readdir.init([`${__dirname}/resources`]);
 // OR const resources = readdir.init(`${__dirname}/resources`);
 ```
