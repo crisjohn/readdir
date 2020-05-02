@@ -20,7 +20,7 @@
 
 ```javascript
 
-const readdir = require("readdir");
+const readdir = require("readdir.js");
 
 const resources = readdir.init([`${__dirname}/resources`, `${__dirname}/routes`]);
 /**
