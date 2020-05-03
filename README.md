@@ -10,7 +10,6 @@
 - routes
     - controller
         -> user.js
-        -> add.js
     - index.js
 - server.js
 - app.js
@@ -20,15 +19,60 @@
 ## Initialize readdir
 
 ```javascript
+
 const readdir = require("readdir");
+
 const resources = readdir.init([`${__dirname}/resources`, `${__dirname}/routes`]);
+/**
+ * resources.data:
+ *  {
+ *      myFunction: [Function],
+ *      myClass: [Function: MyClass],
+ *      user: [Function],
+ *      index: {}
+ *  }
+ **/
+
 const resources1 = readdir.init(`${__dirname}/resources`);
+/**
+ * resources1.data:
+ *  {
+ *      myFunction: [Function],
+ *      myClass: [Function: MyClass]
+ *  }
+ **/
+
 const resources2 = readdir.init(`${__dirname}/resources`, true);
+/**
+ * resources2.data:
+ *  {
+ *      resources: {
+ *          functions: {
+ *              myFunction: [Function]
+ *          },
+ *          classes: {
+ *              myClass: [Function: MyClass]
+ *          }
+ *      }
+ *  }
+ **/
 ```
 
 ## get
 
 ```javascript
-resources.get("resources.functions");
-// { myFunction: { test: true }, myFunction2: [Function] }
+
+resources.get('myFunction');
+/**
+ * return: [Function]
+ **/
+
+resources2.get('resources.functions');
+/**
+ * return: {
+ *      myFunction: [Function]
+ * }
+ **/
+
+
 ```
