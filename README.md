@@ -1,15 +1,29 @@
 # readdir
 
+## Sample Directory
 ```bash
-npm install
+- resources
+    - functions
+        -> myFunction.js
+    - classes
+        -> myClass.js
+- routes
+    - controller
+        -> user.js
+        -> add.js
+    - index.js
+- server.js
+- app.js
+- package.json
 ```
 
-## Initialize
+## Initialize readdir
 
 ```javascript
-const readdir = require("./node_modules/readdir");
-const resources = readdir.init([`${__dirname}/resources`]);
-// OR const resources = readdir.init(`${__dirname}/resources`);
+const readdir = require("readdir");
+const resources = readdir.init([`${__dirname}/resources`, `${__dirname}/routes`]);
+const resources1 = readdir.init(`${__dirname}/resources`);
+const resources2 = readdir.init(`${__dirname}/resources`, true);
 ```
 
 ## get
@@ -17,11 +31,4 @@ const resources = readdir.init([`${__dirname}/resources`]);
 ```javascript
 resources.get("resources.functions");
 // { myFunction: { test: true }, myFunction2: [Function] }
-```
-
-## exec
-
-```javascript
-resources.exec("resources.functions", 234);
-// { function2: 236, functions: { function1: 1, test: { test: 234 } } }
 ```

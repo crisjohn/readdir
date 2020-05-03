@@ -8,7 +8,8 @@
  */
 const fs = require('fs');
 const path = require('path');
-const _ = require('lodash');
+
+let showPath = false;
 
 /**
  * basename
@@ -40,6 +41,17 @@ const isFile = (p) => fs.lstatSync(p).isFile();
 const join = (p1, p2) => path.join(p1, p2);
 
 /**
+ * get
+ * @param {string} p path target
+ * @param {object} obj object target
+ */
+const get = (p, obj) => {
+    let temp = obj;
+    p.toString().split('.').forEach(n => temp = temp[n]);
+    return temp;
+};
+
+/**
  * readTargetPath
  * @param {string} targetPath path to check
  * @param {object} obj to stored the data
@@ -51,76 +63,62 @@ const readTargetPath = (targetPath, obj) => {
                 try {
                     // if target path is directory
                     if (isDirectory(join(targetPath, i))) {
-                        obj[basename(i)] = {};
-                        readTargetPath(join(targetPath, i), obj[i]);
+                        if (showPath) {
+                            obj[basename(i)] = {};
+                            readTargetPath(join(targetPath, i), obj[i]);
+                        }
+                        else {
+                            readTargetPath(join(targetPath, i), obj);
+                        }
                     }
                     // if target path is file
                     else if (isFile(join(targetPath, i))) {
                         obj[basename(i)] = require(join(targetPath, i));
                     } else {
-                        console.error('[READDIR] ERROR', 'unknown type of target');
+                        console.trace('unknown type of target');
                     }
                 } catch (error) {
-                    console.error('[READDIR] ERROR', error.message);
+                    console.trace(error)
                 }
             }
         } else if (isFile(targetPath)) {
             obj = require(targetPath);
         } else {
-            console.error('[READDIR] ERROR', 'unknown type of target');
+            console.trace('unknown type of target')
         }
         return obj;
     } catch (error) {
-        console.error('[READDIR] ERROR', error.message);
+        console.trace(error)
     }
-}
-
-/**
- * execute
- * @param {Object} obj 
- * @param {Array} params 5 arguments only, increase if needed.
- */
-const execute = (obj, params) => {
-
-    const mapping = (param) => {
-        return _.mapValues(param, (v) => {
-            if (v && typeof v === "function") return v(params[0], params[1], params[2], params[3], params[4])
-            else if(v && typeof v === "object") return mapping(v, params)
-            else return v
-        });
-    }
-
-    return mapping(obj);
 }
 
 /**
  * initialize
  * @param {array||string} paths target path to lookup
+ * @param {boolean} sp show path of each imported file. default false
  */
-const init = (paths) => {
+const init = (paths, sp = false) => {
 
     // temp storage
     let temp = {};
 
+    // show path
+    showPath = sp;
+
     for (let p of Array.isArray(paths) ? paths : [paths]) {
-        console.time(`[READDIR] ${basename(p)} done init`)
-        temp[basename(p)] = readTargetPath(p, {});
-        console.timeEnd(`[READDIR] ${basename(p)} done init`)
+        if (showPath) temp[basename(p)] = readTargetPath(p, {});
+        else temp = Object.assign(temp, readTargetPath(p, {}));
     }
 
     return {
+        "data": temp,
         /**
          * get
-         * @example "folder.folder" or "folder.folder.file"
-         * @param {string} val value to lookup
+         * @param {string} val target name
+         * @example get('bar.foo.myFunction')
+         * @return {any}
          */
-        "get": (val) => _.get(temp, val),
-        /**
-         * exec
-         * @val [String] 
-         * @params [any]
-         */
-        "exec": (val, ...params) => execute(_.get(temp, val), params)
+        "get": (val) => get(val, temp)
     };
 
 };
